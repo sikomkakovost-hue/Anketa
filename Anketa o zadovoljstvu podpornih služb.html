@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notranja anketa — Ocenjevanje služb</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;background:#F5F5F5;color:#1a1a1a;min-height:100vh;font-size:14px}
+.teams-header{background:#6264A7;color:#fff;padding:12px 20px;display:flex;align-items:center;gap:12px}
+.teams-header h1{font-size:16px;font-weight:600}
+.teams-header p{font-size:12px;opacity:0.8;margin-top:1px}
+.teams-logo{width:36px;height:36px;min-width:36px;border-radius:8px;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:18px}
+.container{max-width:720px;margin:1.5rem auto;padding:0 1rem 4rem}
+.card{background:#fff;border-radius:8px;border:1px solid #E0E0E0;padding:1.25rem;margin-bottom:1rem;box-shadow:0 1px 3px rgba(0,0,0,0.06)}
+.step{display:none}.step.active{display:block}
+.field-label{font-size:12px;color:#616161;display:block;margin-bottom:5px;font-weight:600;text-transform:uppercase;letter-spacing:0.04em}
+select{width:100%;padding:9px 12px;border:1px solid #BDBDBD;border-radius:4px;font-size:14px;font-family:Arial,sans-serif;color:#1a1a1a;background:#fff;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23616161' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+select:focus{outline:none;border-color:#6264A7;box-shadow:0 0 0 2px rgba(98,100,167,0.2)}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border-radius:4px;border:1px solid #BDBDBD;background:#fff;cursor:pointer;font-size:13px;font-family:Arial,sans-serif;color:#1a1a1a;font-weight:500;transition:all 0.12s}
+.btn:hover{background:#F5F5F5}
+.btn:disabled{opacity:0.45;cursor:not-allowed}
+.btn-teams{background:#6264A7;color:#fff;border-color:#6264A7}
+.btn-teams:hover:not(:disabled){background:#4F52A3}
+.btn-green{background:#107C10;color:#fff;border-color:#107C10}
+.btn-green:hover:not(:disabled){background:#0A6A0A}
+.btn-row{display:flex;gap:8px;margin-top:1.25rem;align-items:center;flex-wrap:wrap}
+.progress-wrap{margin-bottom:1.25rem}
+.progress-label{font-size:12px;color:#616161;margin-bottom:5px;display:flex;justify-content:space-between}
+.progress-bar{height:4px;background:#E0E0E0;border-radius:2px;overflow:hidden}
+.progress-fill{height:100%;background:#6264A7;border-radius:2px;transition:width 0.3s}
+.svc-header{display:flex;align-items:center;gap:10px;margin-bottom:1rem;padding-bottom:0.85rem;border-bottom:1px solid #F0F0F0}
+.svc-num{width:28px;height:28px;min-width:28px;border-radius:50%;background:#EBEBF0;color:#6264A7;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px}
+.svc-name{font-size:16px;font-weight:600;color:#252525}
+.q-block{margin-bottom:1rem;padding-bottom:1rem;border-bottom:1px solid #F5F5F5;position:relative}
+.q-block:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.q-num{font-size:11px;font-weight:700;color:#9E9E9E;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:3px}
+/* Tooltip on question label */
+.q-text-wrap{display:flex;align-items:flex-start;gap:6px;margin-bottom:10px}
+.q-text{font-size:13px;color:#424242;line-height:1.5;flex:1}
+.tooltip-icon{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;min-width:18px;border-radius:50%;background:#6264A7;color:#fff;font-size:11px;font-weight:700;cursor:help;position:relative;margin-top:1px}
+.tooltip-box{position:absolute;left:0;top:calc(100% + 6px);z-index:100;background:#2D2D2D;color:#fff;border-radius:6px;padding:12px 14px;font-size:12px;line-height:1.7;width:340px;max-width:90vw;box-shadow:0 4px 16px rgba(0,0,0,0.25);display:none;pointer-events:none}
+.tooltip-box::before{content:'';position:absolute;top:-6px;left:20px;border:6px solid transparent;border-top:none;border-bottom-color:#2D2D2D}
+.tooltip-icon:hover .tooltip-box{display:block}
+/* Score buttons 1-10 */
+.score-row{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:4px}
+.score-btn{width:38px;height:38px;border-radius:4px;border:1px solid #BDBDBD;background:#FAFAFA;cursor:pointer;font-size:13px;font-weight:700;color:#616161;transition:all 0.1s;font-family:Arial,sans-serif}
+.score-btn:hover{background:#EBEBF0;border-color:#6264A7;color:#6264A7}
+.score-btn.sel-great{background:#107C10;color:#fff;border-color:#107C10}
+.score-btn.sel-good{background:#6264A7;color:#fff;border-color:#6264A7}
+.score-btn.sel-warn{background:#C4314B;color:#fff;border-color:#C4314B}
+.scale-hint{display:flex;justify-content:space-between;font-size:11px;color:#9E9E9E;max-width:384px;margin-bottom:8px}
+textarea{width:100%;padding:8px 10px;border:1px solid #BDBDBD;border-radius:4px;font-size:13px;font-family:Arial,sans-serif;color:#1a1a1a;resize:vertical;min-height:56px;background:#FAFAFA;transition:border-color 0.12s}
+textarea:focus{outline:none;border-color:#6264A7;background:#fff}
+textarea.err{border-color:#C4314B;background:#FFF5F6}
+.req-msg{font-size:12px;color:#C4314B;margin-top:3px;display:none}
+.req-msg.show{display:block}
+.err-banner{background:#FFF5F6;border:1px solid #F3D0D5;border-radius:4px;padding:8px 12px;font-size:13px;color:#C4314B;margin-bottom:1rem;display:none}
+.err-banner.show{display:block}
+/* Summary */
+.sum-svc{margin-bottom:0.85rem}
+.sum-svc-head{font-size:13px;font-weight:600;color:#6264A7;padding:7px 12px;background:#EBEBF0;border-radius:4px 4px 0 0;display:flex;justify-content:space-between}
+.sum-avg{font-size:12px;color:#616161;font-weight:400}
+.sum-rows{border:1px solid #E0E0E0;border-top:none;border-radius:0 0 4px 4px}
+.sum-row{display:flex;align-items:center;padding:8px 12px;border-bottom:1px solid #F5F5F5;font-size:12px;gap:8px}
+.sum-row:last-child{border-bottom:none}
+.sum-lbl{color:#616161;min-width:170px}
+.sum-cmt{font-size:11px;color:#9E9E9E;font-style:italic;flex:1;text-align:right;padding-right:6px}
+.sum-sc{width:26px;height:26px;min-width:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;margin-left:auto}
+.sc-g{background:#DFF6DD;color:#107C10}
+.sc-m{background:#FFF4CE;color:#7A5700}
+.sc-b{background:#FCE8EC;color:#C4314B}
+/* Done */
+.done-wrap{text-align:center;padding:2.5rem 1rem}
+.done-icon{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;font-size:26px}
+.done-wrap h2{font-size:18px;font-weight:600;margin-bottom:6px}
+.done-wrap p{font-size:13px;color:#616161;margin-bottom:1.25rem;line-height:1.6}
+/* OE cards */
+.oe-choices{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.oe-choice{border:1px solid #BDBDBD;border-radius:6px;padding:10px 14px;cursor:pointer;transition:all 0.12s;font-size:13px;color:#424242;display:flex;align-items:center;gap:10px;background:#fff}
+.oe-choice:hover{border-color:#6264A7;background:#F5F5FF}
+.oe-choice.selected{border-color:#6264A7;background:#EBEBF0;font-weight:600;color:#6264A7}
+.oe-choice .oe-icon{width:28px;height:28px;min-width:28px;border-radius:50%;background:#EBEBF0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#6264A7}
+.oe-choice.selected .oe-icon{background:#6264A7;color:#fff}
+.info-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;align-items:center}
+.info-tag{background:#F5F5F5;border:1px solid #E0E0E0;border-radius:4px;padding:2px 8px;font-size:11px;color:#616161}
+.cfg-banner{background:#FFF8E6;border:1px solid #FFD75E;border-radius:4px;padding:10px 14px;font-size:13px;color:#7A5700;margin-bottom:1rem;line-height:1.6}
+.cfg-banner strong{display:block;margin-bottom:3px}
+.cfg-banner code{background:#FFF0B2;padding:1px 5px;border-radius:3px;font-family:monospace;font-size:12px;word-break:break-all}
+.overlay{position:fixed;inset:0;background:rgba(255,255,255,0.88);display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;z-index:999}
+.overlay.show{display:flex}
+.spinner{width:36px;height:36px;border:3px solid #E0E0E0;border-top-color:#6264A7;border-radius:50%;animation:spin 0.75s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spin-txt{font-size:13px;color:#6264A7;font-weight:500}
+@media(max-width:520px){.score-btn{width:32px;height:32px;font-size:12px}.sum-lbl{min-width:110px}}
+</style>
+</head>
+<body>
+
+<div class="teams-header">
+  <div class="teams-logo">📋</div>
+  <div>
+    <h1>Notranja anketa — Ocenjevanje služb</h1>
+    <p>Interno ocenjevanje kakovosti notranjih služb · Odgovori se shranjujejo v Teams</p>
+  </div>
+</div>
+
+<div class="container">
+
+  <div class="cfg-banner" id="cfg-banner">
+    <strong>⚙️ Nastavitev: vnesite Power Automate URL</strong>
+    Odprite to datoteko v urejevalniku besedil in zamenjajte vrednost z URL-jem iz Power Automate toka:<br><br>
+    <code>const FLOW_URL = "https://defaulta577f43ff7b842c9ba9927708e35b6.2b.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/05/workflows/116d2da5bf604ce7b02484fbac3c70da/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=XPYCLkJ-55MWt_2h-pF7mln2MoB0BX_PKHmNXpfI8I4";</code>
+  </div>
+
+  <!-- STEP 1: Izbira osebe -->
+  <div id="step-select" class="step active">
+    <div class="card">
+      <div style="margin-bottom:1rem">
+        <div style="font-size:16px;font-weight:600;margin-bottom:5px">Dobrodošli</div>
+        <div style="font-size:13px;color:#616161;line-height:1.6">Za vsako ocenjevano službo odgovorite na 3 vprašanja (lestvica 1–10). Pri oceni <strong>8 ali manj</strong> je komentar <strong>obvezen</strong>. Z miško se postavite nad vprašanje za razlago meril.</div>
+      </div>
+      <label class="field-label">Vaše ime</label>
+      <select id="oseba-select" onchange="onOsebaChange()">
+        <option value="">— izberite vaše ime —</option>
+      </select>
+      <div id="oe-select-wrap" style="display:none;margin-top:1rem">
+        <label class="field-label">Izberite organizacijsko enoto za katero izpolnjujete anketo</label>
+        <div class="oe-choices" id="oe-choices"></div>
+      </div>
+      <div id="oe-single-info" style="display:none;margin-top:10px">
+        <div class="info-row">
+          <span style="font-size:13px;color:#424242">Oddelek:</span>
+          <span class="info-tag" id="oe-single-name" style="font-weight:600;font-size:13px"></span>
+          <span class="info-tag" id="svc-tag"></span>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:flex-end">
+      <button class="btn btn-teams" onclick="startAnketa()">Začni →</button>
+    </div>
+  </div>
+
+  <!-- STEP 2: Obrazec -->
+  <div id="step-form" class="step">
+    <div class="progress-wrap">
+      <div class="progress-label">
+        <span id="prog-txt"></span>
+        <span id="prog-pct" style="color:#9E9E9E"></span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="prog-fill"></div></div>
+    </div>
+    <div class="err-banner" id="err-banner">⚠️ Ocenite vse tri postavke. Pri oceni 8 ali manj je komentar obvezen.</div>
+    <div class="card" id="svc-container"></div>
+    <div class="btn-row">
+      <button class="btn" id="btn-prev" onclick="prevSvc()" style="display:none">← Nazaj</button>
+      <button class="btn btn-teams" id="btn-next" onclick="nextSvc()">Naprej →</button>
+    </div>
+  </div>
+
+  <!-- STEP 3: Pregled -->
+  <div id="step-summary" class="step">
+    <div class="card" style="margin-bottom:1rem">
+      <div style="font-size:15px;font-weight:600;margin-bottom:4px">Pregled pred oddajo</div>
+      <div style="font-size:12px;color:#616161">Zelena = 9–10 · Rumena = 8 · Rdeča = 1–7</div>
+    </div>
+    <div id="sum-container"></div>
+    <div class="btn-row">
+      <button class="btn" onclick="goBack()">← Popravi</button>
+      <button class="btn" onclick="exportCSV()">⬇ CSV</button>
+      <button class="btn btn-green" id="btn-submit" onclick="submitAnketa()">✓ Oddaj v Teams</button>
+    </div>
+  </div>
+
+  <!-- STEP 4: Zaključek -->
+  <div id="step-done" class="step">
+    <div class="card">
+      <div class="done-wrap">
+        <div class="done-icon" id="done-icon"></div>
+        <h2 id="done-title"></h2>
+        <p id="done-msg"></p>
+        <button class="btn btn-teams" onclick="resetAll()">Nova anketa</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="spinner"></div>
+  <div class="spin-txt" id="spin-txt">Shranjujem v Teams SharePoint...</div>
+</div>
+
+<script>
+// ================================================================
+//  ⚙️  NASTAVITEV — zamenjajte z vašim Power Automate URL-jem
+// ================================================================
+const FLOW_URL = "https://defaulta577f43ff7b842c9ba9927708e35b6.2b.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/05/workflows/116d2da5bf604ce7b02484fbac3c70da/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=XPYCLkJ-55MWt_2h-pF7mln2MoB0BX_PKHmNXpfI8I4";
+// ================================================================
+
+if (FLOW_URL !== "VAŠA_POWER_AUTOMATE_URL_TUKAJ") {
+  document.getElementById('cfg-banner').style.display = 'none';
+}
+
+const THRESHOLD = 8; // ocena <= 8 zahteva komentar
+
+const oddelki = [
+  {oe:"Sistemi in Kakovost",oseba:"Janoš Cigale",ocenjuje:["Laboratorij","Vzdrževanje objektov in Infrastruktura"]},
+  {oe:"Laboratorij",oseba:"Peter Kernel",ocenjuje:["Sistemi in Kakovost","Trženje in prodaja","Nabava","Razvoj Idrija","Razvoj Postojna","Logistika","Orodjarna","Vzdrževanje opreme","Vzdrževanje objektov in Infrastruktura","Procesna tehnologija Komutatorji","Procesna tehnologija Magnetika","Procesna tehnologija Materiali","Procesna tehnologija Hibridika","Procesna tehnologija Pogoni","Procesna tehnologija Elektronika"]},
+  {oe:"Trženje in prodaja",oseba:"Uroš Likar",ocenjuje:["Sistemi in Kakovost","Nabava","Razvoj Idrija","Razvoj Postojna","Orodjarna","Vzdrževanje objektov in Infrastruktura"]},
+  {oe:"Nabava",oseba:"Igor Bogataj",ocenjuje:["Sistemi in Kakovost","Laboratorij","Logistika","Vzdrževanje opreme","Vzdrževanje objektov in Infrastruktura","Pogoni","Elektronika"]},
+  {oe:"Razvoj Idrija",oseba:"Franc Lahajnar",ocenjuje:["Sistemi in Kakovost","Laboratorij","Strojegradnja","Vzdrževanje objektov in Infrastruktura"]},
+  {oe:"Razvoj Postojna",oseba:"Klemen Jovanović",ocenjuje:["Sistemi in Kakovost","Laboratorij","Trženje in prodaja","Nabava","Razvoj Idrija","Strojegradnja","Logistika","Orodjarna","Vzdrževanje objektov in Infrastruktura"]},
+  {oe:"Strojegradnja",oseba:"Jože Podobnik",ocenjuje:["Sistemi in Kakovost","Trženje in prodaja","Nabava","Vzdrževanje opreme","Vzdrževanje objektov in Infrastruktura"]},
+  {oe:"Logistika",oseba:"Katja Dežela",ocenjuje:["Sistemi in Kakovost","Trženje in prodaja","Nabava","Razvoj Idrija","Razvoj Postojna","Vzdrževanje opreme","Vzdrževanje objektov in Infrastruktura","Procesna tehnologija Komutatorji","Procesna tehnologija Magnetika","Procesna tehnologija Hibridika","Procesna tehnologija Pogoni","Procesna tehnologija Elektronika","Pogoni","Elektronika"]},
+  {oe:"Orodjarna",oseba:"Jožko Jazbar",ocenjuje:["Sistemi in Kakovost","Laboratorij","Vzdrževanje objektov in Infrastruktura"]},
+  {oe:"Vzdrževanje opreme",oseba:"Nejc Pirih",ocenjuje:["Sistemi in Kakovost","Strojegradnja","Vzdrževanje objektov in Infrastruktura"]},
+  {oe:"Vzdrževanje objektov in Infrastruktura",oseba:"Ivan Jereb",ocenjuje:["Sistemi in Kakovost","Nabava","Logistika","Vzdrževanje opreme"]},
+  {oe:"Procesna tehnologija Komutatorji",oseba:"Sašo Wahl",ocenjuje:["Sistemi in Kakovost","Laboratorij","Razvoj Idrija","Strojegradnja","Logistika","Orodjarna","Vzdrževanje opreme"]},
+  {oe:"Komutatorji HB Idrija / Sp. Kanomlja",oseba:"Igor Bončina",ocenjuje:["Sistemi in Kakovost","Laboratorij","Logistika","Orodjarna","Vzdrževanje opreme","Vzdrževanje objektov in Infrastruktura","Procesna tehnologija Komutatorji","Vlek Idrija"]},
+  {oe:"Komutatorji HPG Idrija",oseba:"Robi Karlin",ocenjuje:["Sistemi in Kakovost","Laboratorij","Logistika","Orodjarna","Vzdrževanje opreme","Vzdrževanje objektov in Infrastruktura","Procesna tehnologija Komutatorji","Vlek Idrija"]},
+  {oe:"Vlek Idrija",oseba:"Igor Bončina",ocenjuje:["Sistemi in Kakovost","Laboratorij","Logistika","Orodjarna","Vzdrževanje opreme","Vzdrževanje objektov in Infrastruktura","Procesna tehnologija Komutatorji"]},
+  {oe:"Komutatorji HB Dekani",oseba:"Igor Bončina",ocenjuje:["Sistemi in Kakovost","Laboratorij","Logistika","Orodjarna","Vzdrževanje opreme","Vzdrževanje objektov in Infrastruktura","Procesna tehnologija Komutatorji","Komutatorji HB Idrija / Sp. Kanomlja"]},
+  {oe:"Procesna tehnologija Magnetika",oseba:"Dejan Radetić",ocenjuje:["Sistemi in Kakovost","Laboratorij","Razvoj Idrija","Strojegradnja","Logistika","Orodjarna","Vzdrževanje opreme","Vzdrževanje objektov in Infrastruktura","Procesna tehnologija Materiali"]},
+  {oe:"Procesna tehnologija Materiali",oseba:"Karla Kosmač",ocenjuje:["Sistemi in Kakovost","Laboratorij","Razvoj Idrija","Strojegradnja","Logistika","Orodjarna","Vzdrževanje opreme","Vzdrževanje objektov in Infrastruktura","Procesna tehnologija Magnetika"]},
+  {oe:"Magnetika Idrija",oseba:"Andrej Kokalj",ocenjuje:["Sistemi in Kakovost","Laboratorij","Logistika","Orodjarna","Vzdrževanje opreme","Vzdrževanje objektov in Infrastruktura","Procesna tehnologija Magnetika"]},
+  {oe:"Materiali Logatec",oseba:"Andrej Kokalj",ocenjuje:["Sistemi in Kakovost","Laboratorij","Logistika","Orodjarna","Vzdrževanje opreme","Vzdrževanje objektov in Infrastruktura","Procesna tehnologija Materiali"]},
+  {oe:"Procesna tehnologija Hibridika",oseba:"Peter Prudič",ocenjuje:["Sistemi in Kakovost","Laboratorij","Strojegradnja","Orodjarna","Vzdrževanje opreme","Vzdrževanje objektov in Infrastruktura"]},
+  {oe:"Hibridika",oseba:"Klemen Šavli",ocenjuje:["Sistemi in Kakovost","Laboratorij","Nabava","Razvoj Idrija","Razvoj Postojna","Strojegradnja","Logistika","Orodjarna","Vzdrževanje opreme","Vzdrževanje objektov in Infrastruktura"]},
+  {oe:"Interier & Eksterier",oseba:"Dejan Vadnjal",ocenjuje:["Sistemi in Kakovost","Laboratorij","Nabava","Razvoj Postojna","Logistika","Orodjarna","Vzdrževanje opreme","Vzdrževanje objektov in Infrastruktura"]},
+  {oe:"Metalizacija",oseba:"Dejan Vadnjal",ocenjuje:["Sistemi in Kakovost","Laboratorij","Nabava","Razvoj Idrija","Razvoj Postojna","Logistika","Orodjarna","Vzdrževanje opreme","Vzdrževanje objektov in Infrastruktura"]},
+  {oe:"Procesna tehnologija Pogoni",oseba:"Rok Erjavec",ocenjuje:["Sistemi in Kakovost","Laboratorij","Trženje in prodaja","Nabava","Razvoj Idrija","Strojegradnja","Logistika","Orodjarna","Vzdrževanje opreme","Vzdrževanje objektov in Infrastruktura","Procesna tehnologija Magnetika","Procesna tehnologija Hibridika","Metalizacija","Procesna tehnologija Elektronika"]},
+  {oe:"Procesna tehnologija Elektronika",oseba:"Urban Petrič",ocenjuje:["Sistemi in Kakovost","Laboratorij","Trženje in prodaja","Nabava","Razvoj Idrija","Logistika","Orodjarna","Vzdrževanje opreme","Vzdrževanje objektov in Infrastruktura","Procesna tehnologija Hibridika","Metalizacija","Procesna tehnologija Pogoni"]},
+  {oe:"Pogoni",oseba:"Šepla Vegelj Tavčar",ocenjuje:["Sistemi in Kakovost","Laboratorij","Trženje in prodaja","Nabava","Razvoj Idrija","Strojegradnja","Logistika","Orodjarna","Vzdrževanje opreme","Vzdrževanje objektov in Infrastruktura","Procesna tehnologija Magnetika","Procesna tehnologija Hibridika","Metalizacija","Procesna tehnologija Pogoni","Procesna tehnologija Elektronika","Elektronika"]},
+  {oe:"Elektronika",oseba:"Drago Peternelj",ocenjuje:["Sistemi in Kakovost","Laboratorij","Trženje in prodaja","Nabava","Razvoj Idrija","Logistika","Orodjarna","Vzdrževanje opreme","Vzdrževanje objektov in Infrastruktura","Procesna tehnologija Hibridika","Metalizacija","Procesna tehnologija Pogoni","Procesna tehnologija Elektronika"]},
+];
+
+const qLabels = ["Kakovost storitev","Odzivnost in pravočasnost","Sodelovanje in komunikacija"];
+
+const qTexts = [
+  s => `Kako ocenjujete kakovost storitev, ki jih zagotavlja ${s}?`,
+  s => `Kako ocenjujete odzivnost in pravočasnost ${s}?`,
+  s => `Kako ocenjujete sodelovanje in komunikacijo s ${s}?`
+];
+
+const tooltips = [
+  `1. Strokovno znanje: Raven strokovnega znanja in usposobljenosti osebja za reševanje specifičnih težav.\n2. Usposobljenost za uporabo orodij: Spretnost pri uporabi potrebne programske opreme, sistemov in tehnologij.\n3. Reševanje kompleksnih težav: Sposobnost reševanja zahtevnih ali neobičajnih težav.\n4. Sposobnost učenja in prilagajanja: Kako hitro se podporne službe prilagajajo novim tehnologijam ali spremembam v postopkih.\n5. Kreativnost pri iskanju rešitve: Sposobnost iskanja inovativnih in učinkovitih rešitev za težave uporabnikov.`,
+  `1. Hitrost odziva: Čas, potreben za prvotni odgovor na zahtevo ali težavo.\n2. Čas rešitve težav: Čas, potreben za popolno rešitev težave od trenutka prijave do zaključka.\n3. Razpoložljivost: Stopnja dostopnosti podpornih služb (npr. delovni čas, dostopnost v nujnih primerih).\n4. Sposobnost obvladovanja več nalog: Kako učinkovito podporne službe obravnavajo in upravljajo z več težavami hkrati.\n5. Odziv na nujne primere: Hitrost in učinkovitost pri obravnavi nujnih in kritičnih situacij.`,
+  `1. Jasnost sporočil: Kako jasno in razumljivo so izražena navodila in informacije.\n2. Prijaznost in profesionalnost: Ton komunikacije, vljudnost in strokovnost v stiku z uporabniki.\n3. Aktivno poslušanje: Kako dobro podporne službe poslušajo in razumejo potrebe in skrbi uporabnikov.\n4. Povratne informacije: Kakovost in pogostost povratnih informacij uporabnikom o statusu njihovih zahtevkov ali težav.\n5. Zanesljivost informacij: Natančnost in pravilnost posredovanih informacij.`
+];
+
+// Zgradi seznam unikatnih oseb
+const osebeMap = {};
+oddelki.forEach(od => {
+  if (!osebeMap[od.oseba]) osebeMap[od.oseba] = [];
+  osebeMap[od.oseba].push(od);
+});
+const osebeList = Object.keys(osebeMap).sort();
+
+let curOseba = null, curOE = null, curIdx = 0, answers = [];
+
+const sel = document.getElementById('oseba-select');
+osebeList.forEach(ime => {
+  const o = document.createElement('option');
+  o.value = ime; o.textContent = ime; sel.appendChild(o);
+});
+
+function onOsebaChange() {
+  const ime = sel.value;
+  document.getElementById('oe-select-wrap').style.display = 'none';
+  document.getElementById('oe-single-info').style.display = 'none';
+  curOE = null;
+  if (!ime) { curOseba = null; return; }
+  curOseba = ime;
+  const oeji = osebeMap[ime];
+  if (oeji.length === 1) {
+    curOE = oeji[0];
+    document.getElementById('oe-single-name').textContent = curOE.oe;
+    document.getElementById('svc-tag').textContent = `Ocenjuje ${curOE.ocenjuje.length} služb`;
+    document.getElementById('oe-single-info').style.display = 'block';
+  } else {
+    const choicesEl = document.getElementById('oe-choices');
+    choicesEl.innerHTML = '';
+    oeji.forEach((od, i) => {
+      const div = document.createElement('div');
+      div.className = 'oe-choice';
+      div.innerHTML = `<div class="oe-icon">${i+1}</div><div><div style="font-weight:600">${od.oe}</div><div style="font-size:11px;color:#9E9E9E;margin-top:1px">Ocenjuje ${od.ocenjuje.length} služb</div></div>`;
+      div.onclick = () => {
+        document.querySelectorAll('.oe-choice').forEach(c => c.classList.remove('selected'));
+        div.classList.add('selected');
+        curOE = od;
+      };
+      choicesEl.appendChild(div);
+    });
+    document.getElementById('oe-select-wrap').style.display = 'block';
+  }
+}
+
+function showStep(id) {
+  document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function startAnketa() {
+  if (!curOseba) { alert('Prosimo, izberite vaše ime.'); return; }
+  if (!curOE) { alert('Prosimo, izberite organizacijsko enoto.'); return; }
+  answers = curOE.ocenjuje.map(s => ({sluzba:s, scores:[null,null,null], comments:['','','']}));
+  curIdx = 0;
+  showStep('step-form');
+  render();
+}
+
+function scoreClass(val) {
+  if (val === null) return '';
+  if (val >= 9) return 'sel-great';
+  if (val === 8) return 'sel-good';
+  return 'sel-warn';
+}
+
+function isLow(val) { return val !== null && val <= THRESHOLD; }
+
+function render() {
+  const svc = answers[curIdx], total = answers.length, pct = Math.round(curIdx/total*100);
+  document.getElementById('prog-txt').textContent = `Služba ${curIdx+1} od ${total} — ${curOE.oe}`;
+  document.getElementById('prog-pct').textContent = `${pct}%`;
+  document.getElementById('prog-fill').style.width = pct+'%';
+  document.getElementById('btn-prev').style.display = curIdx===0 ? 'none' : '';
+  document.getElementById('btn-next').textContent = curIdx===total-1 ? 'Pregled ✓' : 'Naprej →';
+  document.getElementById('err-banner').classList.remove('show');
+
+  const c = document.getElementById('svc-container'); c.innerHTML = '';
+  const h = document.createElement('div'); h.className = 'svc-header';
+  h.innerHTML = `<div class="svc-num">${curIdx+1}</div><div class="svc-name">${svc.sluzba}</div>`;
+  c.appendChild(h);
+
+  qLabels.forEach((lbl, qi) => {
+    const d = document.createElement('div'); d.className = 'q-block';
+    const low = isLow(svc.scores[qi]), empty = svc.comments[qi].trim()==='';
+
+    // Score buttons 1-10
+    const btns = [1,2,3,4,5,6,7,8,9,10].map(n => {
+      const cls = svc.scores[qi]===n ? ' '+scoreClass(n) : '';
+      return `<button class="score-btn${cls}" onclick="setScore(${qi},${n})">${n}</button>`;
+    }).join('');
+
+    // Tooltip text — convert \n to <br>
+    const tipHtml = tooltips[qi].replace(/\n/g,'<br>');
+
+    d.innerHTML = `
+      <div class="q-num">Vprašanje ${qi+1}</div>
+      <div class="q-text-wrap">
+        <span class="q-text">${qTexts[qi](svc.sluzba)}</span>
+        <span class="tooltip-icon" title="">?
+          <div class="tooltip-box">${tipHtml}</div>
+        </span>
+      </div>
+      <div class="score-row" id="sr-${qi}">${btns}</div>
+      <div class="scale-hint"><span>1 = zelo slabo</span><span>10 = odlično</span></div>
+      <textarea id="ta-${qi}"
+        placeholder="${low ? 'Komentar je obvezen pri oceni 8 ali manj ✱' : 'Komentar (neobvezno)'}"
+        class="${low && empty ? 'err' : ''}">${svc.comments[qi]}</textarea>
+      <div class="req-msg${low && empty ? ' show' : ''}" id="rm-${qi}">✱ Pri oceni 8 ali manj je komentar obvezen.</div>`;
+    c.appendChild(d);
+
+    document.getElementById(`ta-${qi}`).addEventListener('input', e => {
+      answers[curIdx].comments[qi] = e.target.value;
+      if (isLow(answers[curIdx].scores[qi])) {
+        const em = e.target.value.trim()==='';
+        document.getElementById(`rm-${qi}`).classList.toggle('show', em);
+        e.target.classList.toggle('err', em);
+      }
+    });
+  });
+}
+
+function setScore(qi, val) {
+  answers[curIdx].scores[qi] = val;
+  document.querySelectorAll(`#sr-${qi} .score-btn`).forEach((b,i) => {
+    b.classList.remove('sel-great','sel-good','sel-warn');
+    if (i+1===val) b.classList.add(scoreClass(val));
+  });
+  const ta = document.getElementById(`ta-${qi}`), rm = document.getElementById(`rm-${qi}`);
+  if (isLow(val)) {
+    ta.placeholder = 'Komentar je obvezen pri oceni 8 ali manj ✱';
+    const em = ta.value.trim()===''; rm.classList.toggle('show', em); ta.classList.toggle('err', em);
+  } else {
+    ta.placeholder = 'Komentar (neobvezno)'; rm.classList.remove('show'); ta.classList.remove('err');
+  }
+}
+
+function validate() {
+  const svc = answers[curIdx]; let ok = true;
+  svc.scores.forEach((sc, qi) => {
+    if (sc===null) { ok=false; return; }
+    if (isLow(sc) && svc.comments[qi].trim()==='') {
+      ok=false;
+      document.getElementById(`rm-${qi}`).classList.add('show');
+      document.getElementById(`ta-${qi}`).classList.add('err');
+    }
+  });
+  if (svc.scores.includes(null)) ok=false;
+  return ok;
+}
+
+function nextSvc() {
+  if (!validate()) { document.getElementById('err-banner').classList.add('show'); window.scrollTo(0,0); return; }
+  if (curIdx < answers.length-1) { curIdx++; render(); } else { showSummary(); }
+}
+
+function prevSvc() { if (curIdx>0) { curIdx--; render(); } }
+
+function sumScoreClass(sc) { return sc>=9?'sc-g':sc===8?'sc-m':'sc-b'; }
+
+function showSummary() {
+  showStep('step-summary');
+  const c = document.getElementById('sum-container'); c.innerHTML='';
+  answers.forEach(a => {
+    const avg = (a.scores.reduce((s,v)=>s+v,0)/3).toFixed(1);
+    const w = document.createElement('div'); w.className='sum-svc';
+    w.innerHTML = `<div class="sum-svc-head">${a.sluzba}<span class="sum-avg">povp. ${avg}/10</span></div>
+      <div class="sum-rows">${qLabels.map((l,i) => {
+        const sc=a.scores[i], cls=sumScoreClass(sc);
+        return `<div class="sum-row"><span class="sum-lbl">${l}</span>${a.comments[i]?`<span class="sum-cmt">${a.comments[i]}</span>`:''}<span class="sum-sc ${cls}">${sc}</span></div>`;
+      }).join('')}</div>`;
+    c.appendChild(w);
+  });
+}
+
+function goBack() { curIdx=answers.length-1; showStep('step-form'); render(); }
+
+function exportCSV() {
+  const BOM='\uFEFF', rows=[['Datum','Oddelek','Odg. oseba','Služba','V1 Kakovost','V2 Odzivnost','V3 Sodelovanje','Povp.','Kom. V1','Kom. V2','Kom. V3']];
+  const d = new Date().toLocaleDateString('sl-SI');
+  answers.forEach(a => {
+    const avg=(a.scores.reduce((s,v)=>s+v,0)/3).toFixed(2);
+    rows.push([d, curOE.oe, curOseba, a.sluzba, ...a.scores, avg, ...a.comments.map(cm=>'"'+cm.replace(/"/g,'""')+'"')]);
+  });
+  const csv=BOM+rows.map(r=>r.join(',')).join('\r\n');
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
+  const url=URL.createObjectURL(blob), el=document.createElement('a');
+  el.href=url; el.download=`Anketa_${curOE.oe.replace(/[\s\/]/g,'_')}_${new Date().toISOString().slice(0,10)}.csv`;
+  document.body.appendChild(el); el.click(); document.body.removeChild(el);
+}
+
+async function submitAnketa() {
+  if (FLOW_URL==="VAŠA_POWER_AUTOMATE_URL_TUKAJ") {
+    alert('⚠️ Power Automate URL ni nastavljen.\nGlejte priložena navodila Navodila_Power_Automate.html');
+    return;
+  }
+  document.getElementById('btn-submit').disabled = true;
+  const ov = document.getElementById('overlay'); ov.classList.add('show');
+  const st = document.getElementById('spin-txt');
+  const datum = new Date().toISOString();
+  let ok=0, fail=0;
+  for (let i=0; i<answers.length; i++) {
+    const a = answers[i];
+    st.textContent = `Shranjujem vrstico ${i+1} od ${answers.length}...`;
+    const body = JSON.stringify({
+        Datum: datum, Oddelek: curOE.oe, OdgovornaOseba: curOseba,
+        OcenjevanaSluzba: a.sluzba,
+        V1_Kakovost: a.scores[0], V2_Odzivnost: a.scores[1], V3_Sodelovanje: a.scores[2],
+        Povprecje: parseFloat((a.scores.reduce((s,v)=>s+v,0)/3).toFixed(2)),
+        Komentar_V1: a.comments[0], Komentar_V2: a.comments[1], Komentar_V3: a.comments[2]
+      });
+      try {
+        const r = await fetch(FLOW_URL, {
+          method:'POST', headers:{'Content-Type':'application/json'}, body
+        });
+        (r.ok||r.status===202) ? ok++ : fail++;
+      } catch(corsErr) {
+        try {
+          await fetch(FLOW_URL, { method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain'}, body });
+          ok++;
+        } catch(e2) { fail++; }
+      }
+  }
+  ov.classList.remove('show');
+  document.getElementById('btn-submit').disabled = false;
+  const icon=document.getElementById('done-icon'), title=document.getElementById('done-title'), msg=document.getElementById('done-msg');
+  if (fail===0) {
+    icon.textContent='✓'; icon.style.background='#DFF6DD';
+    title.textContent='Oddano — hvala!';
+    msg.textContent=`Vseh ${ok} ocen je bilo uspešno shranjenih v Teams SharePoint seznam.`;
+  } else if (ok>0) {
+    icon.textContent='⚠️'; icon.style.background='#FFF4CE';
+    title.textContent='Delno shranjeno';
+    msg.textContent=`${ok} ocen shranjenih, ${fail} ni uspelo. Priporočamo izvoz CSV.`;
+  } else {
+    icon.textContent='✗'; icon.style.background='#FCE8EC';
+    title.textContent='Napaka pri shranjevanju';
+    msg.textContent='Odgovori niso bili shranjeni. Preverite Power Automate URL ali shranite CSV.';
+  }
+  showStep('step-done');
+}
+
+function resetAll() {
+  curOseba=null; curOE=null; answers=[]; curIdx=0;
+  document.getElementById('oseba-select').value='';
+  document.getElementById('oe-select-wrap').style.display='none';
+  document.getElementById('oe-single-info').style.display='none';
+  showStep('step-select');
+}
+</script>
+</body>
+</html>
