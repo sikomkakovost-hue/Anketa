@@ -120,7 +120,29 @@ textarea.err{border-color:#C4314B;background:#FFF5F6}
         <div style="font-size:16px;font-weight:600;margin-bottom:5px">Dobrodošli</div>
         <div style="font-size:13px;color:#616161;line-height:1.6">Za vsako ocenjevano službo odgovorite na 3 vprašanja (lestvica 1–10). Pri oceni <strong>8 ali manj</strong> je komentar <strong>obvezen</strong>. Z miško se postavite nad vprašanje za razlago meril.</div>
       </div>
-      <label class="field-label">Vaše ime</label>
+      <div style="display:flex;gap:12px;margin-bottom:1rem">
+        <div style="flex:1">
+          <label class="field-label">Leto</label>
+          <select id="leto-select">
+            <option value="">— leto —</option>
+            <option value="2024">2024</option>
+            <option value="2025">2025</option>
+            <option value="2026">2026</option>
+            <option value="2027">2027</option>
+          </select>
+        </div>
+        <div style="flex:1">
+          <label class="field-label">Kvartal</label>
+          <select id="kvartal-select">
+            <option value="">— kvartal —</option>
+            <option value="Q1">Q1 (jan–mar)</option>
+            <option value="Q2">Q2 (apr–jun)</option>
+            <option value="Q3">Q3 (jul–sep)</option>
+            <option value="Q4">Q4 (okt–dec)</option>
+          </select>
+        </div>
+      </div>
+      <label class="field-label">Va0161e ime</label>
       <select id="oseba-select" onchange="onOsebaChange()">
         <option value="">— izberite vaše ime —</option>
       </select>
@@ -257,7 +279,7 @@ oddelki.forEach(od => {
 });
 const osebeList = Object.keys(osebeMap).sort();
 
-let curOseba = null, curOE = null, curIdx = 0, answers = [];
+let curOseba = null, curOE = null, curLeto = null, curKvartal = null, curIdx = 0, answers = [];
 
 const sel = document.getElementById('oseba-select');
 osebeList.forEach(ime => {
@@ -303,6 +325,10 @@ function showStep(id) {
 }
 
 function startAnketa() {
+  curLeto = document.getElementById('leto-select').value;
+  curKvartal = document.getElementById('kvartal-select').value;
+  if (!curLeto) { alert('Prosimo, izberite leto.'); return; }
+  if (!curKvartal) { alert('Prosimo, izberite kvartal.'); return; }
   if (!curOseba) { alert('Prosimo, izberite vaše ime.'); return; }
   if (!curOE) { alert('Prosimo, izberite organizacijsko enoto.'); return; }
   answers = curOE.ocenjuje.map(s => ({sluzba:s, scores:[null,null,null], comments:['','','']}));
@@ -430,16 +456,16 @@ function showSummary() {
 function goBack() { curIdx=answers.length-1; showStep('step-form'); render(); }
 
 function exportCSV() {
-  const BOM='\uFEFF', rows=[['Datum','Oddelek','Odg. oseba','Služba','V1 Kakovost','V2 Odzivnost','V3 Sodelovanje','Povp.','Kom. V1','Kom. V2','Kom. V3']];
+  const BOM='\uFEFF', rows=[['Leto','Kvartal','Datum','Oddelek','Odg. oseba','Slu017eba','V1 Kakovost','V2 Odzivnost','V3 Sodelovanje','Povp.','Kom. V1','Kom. V2','Kom. V3']];
   const d = new Date().toLocaleDateString('sl-SI');
   answers.forEach(a => {
     const avg=(a.scores.reduce((s,v)=>s+v,0)/3).toFixed(2);
-    rows.push([d, curOE.oe, curOseba, a.sluzba, ...a.scores, avg, ...a.comments.map(cm=>'"'+cm.replace(/"/g,'""')+'"')]);
+    rows.push([curLeto, curKvartal, d, curOE.oe, curOseba, a.sluzba, ...a.scores, avg, ...a.comments.map(cm=>'"'+cm.replace(/"/g,'""')+'"')]);
   });
   const csv=BOM+rows.map(r=>r.join(',')).join('\r\n');
   const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
   const url=URL.createObjectURL(blob), el=document.createElement('a');
-  el.href=url; el.download=`Anketa_${curOE.oe.replace(/[\s\/]/g,'_')}_${new Date().toISOString().slice(0,10)}.csv`;
+  el.href=url; el.download=`Anketa_${curLeto}_${curKvartal}_${curOE.oe.replace(/[\s\/]/g,'_')}.csv`;
   document.body.appendChild(el); el.click(); document.body.removeChild(el);
 }
 
@@ -457,23 +483,39 @@ async function submitAnketa() {
     const a = answers[i];
     st.textContent = `Shranjujem vrstico ${i+1} od ${answers.length}...`;
     const body = JSON.stringify({
-        Datum: datum, Oddelek: curOE.oe, OdgovornaOseba: curOseba,
-        OcenjevanaSluzba: a.sluzba,
-        V1_Kakovost: a.scores[0], V2_Odzivnost: a.scores[1], V3_Sodelovanje: a.scores[2],
-        Povprecje: parseFloat((a.scores.reduce((s,v)=>s+v,0)/3).toFixed(2)),
-        Komentar_V1: a.comments[0], Komentar_V2: a.comments[1], Komentar_V3: a.comments[2]
+      Leto: curLeto, Kvartal: curKvartal, Datum: datum, Oddelek: curOE.oe, OdgovornaOseba: curOseba,
+      OcenjevanaSluzba: a.sluzba,
+      V1_Kakovost: a.scores[0], V2_Odzivnost: a.scores[1], V3_Sodelovanje: a.scores[2],
+      Povprecje: parseFloat((a.scores.reduce((s,v)=>s+v,0)/3).toFixed(2)),
+      Komentar_V1: a.comments[0], Komentar_V2: a.comments[1], Komentar_V3: a.comments[2]
+    });
+    let sent = false;
+    // 1. poskus: navaden fetch z JSON
+    if (!sent) try {
+      const r = await fetch(FLOW_URL, { method:"POST", headers:{"Content-Type":"application/json"}, body });
+      if (r.ok || r.status===202 || r.status===0) { ok++; sent=true; }
+      else { console.warn("fetch status:", r.status); }
+    } catch(e1) { console.warn("fetch JSON failed:", e1.message); }
+    // 2. poskus: no-cors (Teams iframe)
+    if (!sent) try {
+      await fetch(FLOW_URL, { method:"POST", mode:"no-cors", body });
+      ok++; sent=true;
+      console.log("no-cors sent ok");
+    } catch(e2) { console.warn("no-cors failed:", e2.message); }
+    // 3. poskus: XMLHttpRequest (nekateri Teams odjemalci blokirajo fetch)
+    if (!sent) try {
+      await new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open("POST", FLOW_URL);
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.onload = () => { ok++; sent=true; resolve(); };
+        xhr.onerror = () => { console.warn("XHR error"); resolve(); };
+        xhr.ontimeout = () => { console.warn("XHR timeout"); resolve(); };
+        xhr.timeout = 10000;
+        xhr.send(body);
       });
-      try {
-        const r = await fetch(FLOW_URL, {
-          method:'POST', headers:{'Content-Type':'application/json'}, body
-        });
-        (r.ok||r.status===202) ? ok++ : fail++;
-      } catch(corsErr) {
-        try {
-          await fetch(FLOW_URL, { method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain'}, body });
-          ok++;
-        } catch(e2) { fail++; }
-      }
+    } catch(e3) { console.warn("XHR failed:", e3.message); }
+    if (!sent) fail++;
   }
   ov.classList.remove('show');
   document.getElementById('btn-submit').disabled = false;
@@ -495,7 +537,9 @@ async function submitAnketa() {
 }
 
 function resetAll() {
-  curOseba=null; curOE=null; answers=[]; curIdx=0;
+  curOseba=null; curOE=null; curLeto=null; curKvartal=null; answers=[]; curIdx=0;
+  document.getElementById('leto-select').value='';
+  document.getElementById('kvartal-select').value='';
   document.getElementById('oseba-select').value='';
   document.getElementById('oe-select-wrap').style.display='none';
   document.getElementById('oe-single-info').style.display='none';
