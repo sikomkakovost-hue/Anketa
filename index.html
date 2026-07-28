@@ -216,10 +216,10 @@ textarea.err{border-color:#C4314B;background:#FFF5F6}
 // ================================================================
 //  ⚙️  NASTAVITEV — zamenjajte z vašim Power Automate URL-jem
 // ================================================================
-const FLOW_URL = "VAŠA_POWER_AUTOMATE_URL_TUKAJ";
+const FLOW_URL = "https://defaulta577f43ff7b842c9ba9927708e35b6.2b.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/05/workflows/116d2da5bf604ce7b02484fbac3c70da/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=XPYCLkJ-55MWt_2h-pF7mln2MoB0BX_PKHmNXpfI8I4";
 // ================================================================
 
-if (FLOW_URL !== "VAŠA_POWER_AUTOMATE_URL_TUKAJ") {
+if (FLOW_URL !== "https://defaulta577f43ff7b842c9ba9927708e35b6.2b.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/05/workflows/116d2da5bf604ce7b02484fbac3c70da/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=XPYCLkJ-55MWt_2h-pF7mln2MoB0BX_PKHmNXpfI8I4") {
   document.getElementById('cfg-banner').style.display = 'none';
 }
 
@@ -469,7 +469,7 @@ function exportCSV() {
 }
 
 async function submitAnketa() {
-  if (FLOW_URL==="VAŠA_POWER_AUTOMATE_URL_TUKAJ") {
+  if (FLOW_URL==="https://defaulta577f43ff7b842c9ba9927708e35b6.2b.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/05/workflows/116d2da5bf604ce7b02484fbac3c70da/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=XPYCLkJ-55MWt_2h-pF7mln2MoB0BX_PKHmNXpfI8I4") {
     alert('⚠️ Power Automate URL ni nastavljen.\nGlejte priložena navodila Navodila_Power_Automate.html');
     return;
   }
@@ -483,7 +483,6 @@ async function submitAnketa() {
     st.textContent = `Shranjujem vrstico ${i+1} od ${answers.length}...`;
     const body = JSON.stringify({
       Leto: curLeto, Kvartal: curKvartal, Datum: datum, Oddelek: curOE.oe, OdgovornaOseba: curOseba,
-      OcenjevanaSluzba: a.sluzba,
       OE: a.sluzba,
       V1_Kakovost: a.scores[0], V2_Odzivnost: a.scores[1], V3_Sodelovanje: a.scores[2],
       Povprecje: parseFloat((a.scores.reduce((s,v)=>s+v,0)/3).toFixed(2)),
