@@ -141,7 +141,7 @@ textarea.err{border-color:#C4314B;background:#FFF5F6}
           </select>
         </div>
       </div>
-      <label class="field-label">Va0161e ime</label>
+      <label class="field-label">Vaše ime</label>
       <select id="oseba-select" onchange="onOsebaChange()">
         <option value="">— izberite vaše ime —</option>
       </select>
@@ -216,10 +216,10 @@ textarea.err{border-color:#C4314B;background:#FFF5F6}
 // ================================================================
 //  ⚙️  NASTAVITEV — zamenjajte z vašim Power Automate URL-jem
 // ================================================================
-const FLOW_URL = "https://defaulta577f43ff7b842c9ba9927708e35b6.2b.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/05/workflows/116d2da5bf604ce7b02484fbac3c70da/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=XPYCLkJ-55MWt_2h-pF7mln2MoB0BX_PKHmNXpfI8I4;
+const FLOW_URL = "https://defaulta577f43ff7b842c9ba9927708e35b6.2b.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/05/workflows/116d2da5bf604ce7b02484fbac3c70da/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=XPYCLkJ-55MWt_2h-pF7mln2MoB0BX_PKHmNXpfI8I4";
 // ================================================================
 
-if (FLOW_URL !== "https://defaulta577f43ff7b842c9ba9927708e35b6.2b.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/05/workflows/116d2da5bf604ce7b02484fbac3c70da/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=XPYCLkJ-55MWt_2h-pF7mln2MoB0BX_PKHmNXpfI8I4") {
+if (FLOW_URL && FLOW_URL !== "VAŠA_POWER_AUTOMATE_URL_TUKAJ") {
   document.getElementById('cfg-banner').style.display = 'none';
 }
 
@@ -469,7 +469,7 @@ function exportCSV() {
 }
 
 async function submitAnketa() {
-  if (FLOW_URL==="https://defaulta577f43ff7b842c9ba9927708e35b6.2b.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/05/workflows/116d2da5bf604ce7b02484fbac3c70da/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=XPYCLkJ-55MWt_2h-pF7mln2MoB0BX_PKHmNXpfI8I4") {
+  if (!FLOW_URL || FLOW_URL === "VAŠA_POWER_AUTOMATE_URL_TUKAJ") {
     alert('⚠️ Power Automate URL ni nastavljen.\nGlejte priložena navodila Navodila_Power_Automate.html');
     return;
   }
