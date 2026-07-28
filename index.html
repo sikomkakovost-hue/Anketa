@@ -100,7 +100,8 @@ textarea.err{border-color:#C4314B;background:#FFF5F6}
 <div class="teams-header">
   <div class="teams-logo">📋</div>
   <div>
-    <h1>Anketa o zadovoljstvu podpornih služb</h1>
+    <h1>Notranja anketa — Ocenjevanje služb</h1>
+    <p>Interno ocenjevanje kakovosti notranjih služb · Odgovori se shranjujejo v Teams</p>
   </div>
 </div>
 
@@ -108,26 +109,25 @@ textarea.err{border-color:#C4314B;background:#FFF5F6}
 
   <div class="cfg-banner" id="cfg-banner">
     <strong>⚙️ Nastavitev: vnesite Power Automate URL</strong>
-    Odprite to datoteko v urejevalniku besedil in zamenjajte vrednost z URL-jem iz Power Automate toka:<br><br>
-    <code>const FLOW_URL = "https://defaulta577f43ff7b842c9ba9927708e35b6.2b.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/05/workflows/116d2da5bf604ce7b02484fbac3c70da/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=XPYCLkJ-55MWt_2h-pF7mln2MoB0BX_PKHmNXpfI8I4";</code>
+    Odprite datoteko v urejevalniku besedil in na označenem mestu vnesite vaš Power Automate URL.
   </div>
 
   <!-- STEP 1: Izbira osebe -->
   <div id="step-select" class="step active">
     <div class="card">
       <div style="margin-bottom:1rem">
-        <div style="font-size:24px;font-weight:600;margin-bottom:5px">Dobrodošli</div>
-        <div style="font-size:18px;color:#616161;line-height:1.6">Za vsako ocenjevano službo odgovorite na 3 vprašanja (lestvica 1–10). Pri oceni <strong>8 ali manj</strong> je komentar <strong>obvezen</strong>.</div>
+        <div style="font-size:16px;font-weight:600;margin-bottom:5px">Dobrodošli</div>
+        <div style="font-size:13px;color:#616161;line-height:1.6">Za vsako ocenjevano službo odgovorite na 3 vprašanja (lestvica 1–10). Pri oceni <strong>8 ali manj</strong> je komentar <strong>obvezen</strong>. Z miško se postavite nad vprašanje za razlago meril.</div>
       </div>
       <div style="display:flex;gap:12px;margin-bottom:1rem">
         <div style="flex:1">
           <label class="field-label">Leto</label>
           <select id="leto-select">
             <option value="">— leto —</option>
+            <option value="2024">2024</option>
+            <option value="2025">2025</option>
             <option value="2026">2026</option>
             <option value="2027">2027</option>
-            <option value="2028">2028</option>
-            <option value="2029">2029</option>
           </select>
         </div>
         <div style="flex:1">
@@ -141,7 +141,7 @@ textarea.err{border-color:#C4314B;background:#FFF5F6}
           </select>
         </div>
       </div>
-      <label class="field-label">Ime ocenjevalca </label>
+      <label class="field-label">Va0161e ime</label>
       <select id="oseba-select" onchange="onOsebaChange()">
         <option value="">— izberite vaše ime —</option>
       </select>
@@ -151,7 +151,7 @@ textarea.err{border-color:#C4314B;background:#FFF5F6}
       </div>
       <div id="oe-single-info" style="display:none;margin-top:10px">
         <div class="info-row">
-          <span style="font-size:13px;color:#424242">OE:</span>
+          <span style="font-size:13px;color:#424242">Oddelek:</span>
           <span class="info-tag" id="oe-single-name" style="font-weight:600;font-size:13px"></span>
           <span class="info-tag" id="svc-tag"></span>
         </div>
@@ -189,7 +189,7 @@ textarea.err{border-color:#C4314B;background:#FFF5F6}
     <div class="btn-row">
       <button class="btn" onclick="goBack()">← Popravi</button>
       <button class="btn" onclick="exportCSV()">⬇ CSV</button>
-      <button class="btn btn-green" id="btn-submit" onclick="submitAnketa()">✓ Oddaj anketo</button>
+      <button class="btn btn-green" id="btn-submit" onclick="submitAnketa()">✓ Oddaj v Teams</button>
     </div>
   </div>
 
@@ -216,7 +216,7 @@ textarea.err{border-color:#C4314B;background:#FFF5F6}
 // ================================================================
 //  ⚙️  NASTAVITEV — zamenjajte z vašim Power Automate URL-jem
 // ================================================================
-const FLOW_URL = "https://defaulta577f43ff7b842c9ba9927708e35b6.2b.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/05/workflows/116d2da5bf604ce7b02484fbac3c70da/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=XPYCLkJ-55MWt_2h-pF7mln2MoB0BX_PKHmNXpfI8I4";
+const FLOW_URL = "VAŠA_POWER_AUTOMATE_URL_TUKAJ";
 // ================================================================
 
 if (FLOW_URL !== "VAŠA_POWER_AUTOMATE_URL_TUKAJ") {
@@ -455,7 +455,7 @@ function showSummary() {
 function goBack() { curIdx=answers.length-1; showStep('step-form'); render(); }
 
 function exportCSV() {
-  const BOM='\uFEFF', rows=[['Leto','Kvartal','Datum','Oddelek','Odg. oseba','Slu017eba','V1 Kakovost','V2 Odzivnost','V3 Sodelovanje','Povp.','Kom. V1','Kom. V2','Kom. V3']];
+  const BOM='\uFEFF', rows=[['Leto','Kvartal','Datum','Oddelek','Odg. oseba','Služba','V1 Kakovost','V2 Odzivnost','V3 Sodelovanje','Povp.','Kom. V1','Kom. V2','Kom. V3']];
   const d = new Date().toLocaleDateString('sl-SI');
   answers.forEach(a => {
     const avg=(a.scores.reduce((s,v)=>s+v,0)/3).toFixed(2);
@@ -484,6 +484,7 @@ async function submitAnketa() {
     const body = JSON.stringify({
       Leto: curLeto, Kvartal: curKvartal, Datum: datum, Oddelek: curOE.oe, OdgovornaOseba: curOseba,
       OcenjevanaSluzba: a.sluzba,
+      OE: a.sluzba,
       V1_Kakovost: a.scores[0], V2_Odzivnost: a.scores[1], V3_Sodelovanje: a.scores[2],
       Povprecje: parseFloat((a.scores.reduce((s,v)=>s+v,0)/3).toFixed(2)),
       Komentar_V1: a.comments[0], Komentar_V2: a.comments[1], Komentar_V3: a.comments[2]
