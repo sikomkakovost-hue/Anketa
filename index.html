@@ -455,7 +455,7 @@ function showSummary() {
 function goBack() { curIdx=answers.length-1; showStep('step-form'); render(); }
 
 function exportCSV() {
-  const BOM='\uFEFF', rows=[['Leto','Kvartal','Datum','OE','Odg. oseba','Slu017eba','V1 Kakovost','V2 Odzivnost','V3 Sodelovanje','Povp.','Kom. V1','Kom. V2','Kom. V3']];
+  const BOM='\uFEFF', rows=[['Leto','Kvartal','Datum','Oddelek','Odg. oseba','Slu017eba','V1 Kakovost','V2 Odzivnost','V3 Sodelovanje','Povp.','Kom. V1','Kom. V2','Kom. V3']];
   const d = new Date().toLocaleDateString('sl-SI');
   answers.forEach(a => {
     const avg=(a.scores.reduce((s,v)=>s+v,0)/3).toFixed(2);
@@ -482,7 +482,7 @@ async function submitAnketa() {
     const a = answers[i];
     st.textContent = `Shranjujem vrstico ${i+1} od ${answers.length}...`;
     const body = JSON.stringify({
-      Leto: curLeto, Kvartal: curKvartal, Datum: datum, OE: curOE.oe, OdgovornaOseba: curOseba,
+      Leto: curLeto, Kvartal: curKvartal, Datum: datum, Oddelek: curOE.oe, OdgovornaOseba: curOseba,
       OcenjevanaSluzba: a.sluzba,
       V1_Kakovost: a.scores[0], V2_Odzivnost: a.scores[1], V3_Sodelovanje: a.scores[2],
       Povprecje: parseFloat((a.scores.reduce((s,v)=>s+v,0)/3).toFixed(2)),
