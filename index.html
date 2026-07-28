@@ -101,7 +101,6 @@ textarea.err{border-color:#C4314B;background:#FFF5F6}
   <div class="teams-logo">📋</div>
   <div>
     <h1>Notranja anketa — Ocenjevanje služb</h1>
-    <p>Interno ocenjevanje kakovosti notranjih služb · Odgovori se shranjujejo v Teams</p>
   </div>
 </div>
 
@@ -116,18 +115,18 @@ textarea.err{border-color:#C4314B;background:#FFF5F6}
   <div id="step-select" class="step active">
     <div class="card">
       <div style="margin-bottom:1rem">
-        <div style="font-size:16px;font-weight:600;margin-bottom:5px">Dobrodošli</div>
-        <div style="font-size:13px;color:#616161;line-height:1.6">Za vsako ocenjevano službo odgovorite na 3 vprašanja (lestvica 1–10). Pri oceni <strong>8 ali manj</strong> je komentar <strong>obvezen</strong>. Z miško se postavite nad vprašanje za razlago meril.</div>
+        <div style="font-size:24px;font-weight:600;margin-bottom:5px">Dobrodošli</div>
+        <div style="font-size:18px;color:#616161;line-height:1.6">Za vsako ocenjevano službo odgovorite na 3 vprašanja (lestvica 1–10). Pri oceni <strong>8 ali manj</strong> je komentar <strong>obvezen</strong>.</div>
       </div>
       <div style="display:flex;gap:12px;margin-bottom:1rem">
         <div style="flex:1">
           <label class="field-label">Leto</label>
           <select id="leto-select">
             <option value="">— leto —</option>
-            <option value="2024">2024</option>
-            <option value="2025">2025</option>
-            <option value="2026">2026</option>
-            <option value="2027">2027</option>
+            <option value="2024">2026</option>
+            <option value="2025">2027</option>
+            <option value="2026">2028</option>
+            <option value="2027">2029</option>
           </select>
         </div>
         <div style="flex:1">
@@ -151,7 +150,7 @@ textarea.err{border-color:#C4314B;background:#FFF5F6}
       </div>
       <div id="oe-single-info" style="display:none;margin-top:10px">
         <div class="info-row">
-          <span style="font-size:13px;color:#424242">Oddelek:</span>
+          <span style="font-size:13px;color:#424242">OE:</span>
           <span class="info-tag" id="oe-single-name" style="font-weight:600;font-size:13px"></span>
           <span class="info-tag" id="svc-tag"></span>
         </div>
@@ -189,7 +188,7 @@ textarea.err{border-color:#C4314B;background:#FFF5F6}
     <div class="btn-row">
       <button class="btn" onclick="goBack()">← Popravi</button>
       <button class="btn" onclick="exportCSV()">⬇ CSV</button>
-      <button class="btn btn-green" id="btn-submit" onclick="submitAnketa()">✓ Oddaj v Teams</button>
+      <button class="btn btn-green" id="btn-submit" onclick="submitAnketa()">✓ Oddaj anketo</button>
     </div>
   </div>
 
@@ -347,7 +346,7 @@ function isLow(val) { return val !== null && val <= THRESHOLD; }
 
 function render() {
   const svc = answers[curIdx], total = answers.length, pct = Math.round(curIdx/total*100);
-  document.getElementById('prog-txt').textContent = `Služba ${curIdx+1} od ${total} — ${curOE.oe}`;
+  document.getElementById('prog-txt').textContent = `Služba ${curIdx+1} od ${total} — OE: ${curOE.oe}`;
   document.getElementById('prog-pct').textContent = `${pct}%`;
   document.getElementById('prog-fill').style.width = pct+'%';
   document.getElementById('btn-prev').style.display = curIdx===0 ? 'none' : '';
